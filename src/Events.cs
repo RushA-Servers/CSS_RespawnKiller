@@ -12,21 +12,34 @@ public partial class RespawnKiller
 	public void InitializeEvents()
     {
         RegisterEventHandler<EventPlayerDeath>(OnPlayerDeath,HookMode.Post);
+        RegisterEventHandler<EventPlayerTeam>(OnPlayerJoinTeam);
 
         RegisterListener<Listeners.OnMapStart>(OnMapStart);
-        AddCommandListener("jointeam", OnJoinTeam);
+        // AddCommandListener("jointeam", OnJoinTeam);
+    }
+
+    public HookResult OnPlayerJoinTeam(EventPlayerTeam @event, GameEventInfo info)
+    {
+        var player = @event.Userid;
+        if (player == null || !player.IsValid || !player.PlayerPawn.IsValid || player.PlayerPawn.Value == null)
+        {
+            return HookResult.Continue;
+        }
+
+        AddTimer(1f, () => {
+            Respawn(player);
+        }, TimerFlags.STOP_ON_MAPCHANGE);
+        
+        return HookResult.Continue;
     }
 
     public HookResult OnJoinTeam(CCSPlayerController? player, CommandInfo commandInfo)
 	{
         if (player == null) return HookResult.Continue;
-
-        if (canRespawn)
-        {
-            AddTimer(0.5f, () => {
-                Respawn(player);
-            });
-        }
+        
+        AddTimer(0.5f, () => {
+            Respawn(player);
+        }, TimerFlags.STOP_ON_MAPCHANGE);
 
         AddTimer(0.1f, () => {
             CheckForRoundEndConditions();
@@ -71,16 +84,16 @@ public partial class RespawnKiller
             return HookResult.Continue;
         }
 
-        if (deltaDeath < Config.TimeBtwPlayerDeathsToDetectRespawnKill && autoDetectRespawnKill)
-        {
-            PrintColoredAll(Localizer["rk.auto.detection.disable.respawn"]);
-            canRespawn = false;
-
-            AddTimer(1.0f, () => {
-                CheckForRoundEndConditions();
-            });
-            
-        }
+        // if (deltaDeath < Config.TimeBtwPlayerDeathsToDetectRespawnKill && autoDetectRespawnKill)
+        // {
+        //     PrintColoredAll(Localizer["rk.auto.detection.disable.respawn"]);
+        //     canRespawn = false;
+        //
+        //     AddTimer(1.0f, () => {
+        //         CheckForRoundEndConditions();
+        //     });
+        //     
+        // }
 
         if (canRespawn)
         {

@@ -2,3 +2,5 @@ obj/
 bin/
 addons/
 *.rar
+.DS_STORE
+.idea/

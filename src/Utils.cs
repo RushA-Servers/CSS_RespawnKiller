@@ -8,9 +8,17 @@ namespace RespawnKiller;
 
 public partial class RespawnKiller
 {
+
+    private bool IsPlayerValid(CCSPlayerController? player)
+    {
+        return player != null
+               && player is { IsValid: true, PlayerPawn.IsValid: true }
+               && player.PlayerPawn.Value != null;
+    }
+    
     private void Respawn(CCSPlayerController? player)
     {
-        if (player == null) return;
+        if (!IsPlayerValid(player)) return;
 
         if (player.PawnIsAlive)
         {
@@ -107,26 +115,19 @@ public partial class RespawnKiller
 
     public string GetCurrentMapConfigPath()
     {
-        return $"{gameDir}/csgo/cfg/RespawnKiller/MapSettings/{Server.MapName}.json";
+        var mapConfigFile = $"{ConfigDir}/MapSettings/{Server.MapName}.json";
+        if (!File.Exists(mapConfigFile))
+        {
+            return $"{ConfigDir}/default_map_config.json";
+        }
+
+        return mapConfigFile;
     }
 
     public void ValidateMapSettingsFolder()
     {
-        string path = $"{gameDir}/csgo/cfg";
-
-        if (!Directory.Exists(path))
-        {
-            PrintConError($"Could not find cfg directory in \"{path})\"");
-            return;
-        }
-
-        path += "/RespawnKiller";
-        if (!Directory.Exists(path))
-        {
-            Directory.CreateDirectory(path);
-        }
-
-        path += "/MapSettings";
+        var path = $"{ConfigDir}/MapSettings";
+        
         if (!Directory.Exists(path))
         {
             Directory.CreateDirectory(path);

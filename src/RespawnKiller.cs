@@ -19,7 +19,7 @@ public partial class RespawnKiller : BasePlugin, IPluginConfig<RespawnKillerConf
     public static bool autoDetectRespawnKill = true;
     public static float respawnTime = 0.0f;
 
-    public static string gameDir = "";
+    public static string ConfigDir = "";
 
     // Server.MaxPlayers is causing crash!
     public static double[] lastDeathTime = new double[64];
@@ -34,7 +34,7 @@ public partial class RespawnKiller : BasePlugin, IPluginConfig<RespawnKillerConf
         PrintConDebug($"Loading");
         InitializeEvents();
 
-        gameDir = Server.GameDirectory;
+        ConfigDir = "/serverdata/countersrikesharp/configs/plugins/RespawnKiller";
 
         ValidateMapSettingsFolder();
     }
